@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "*.tcc": "c",
+        "forward_list": "c",
+        "list": "c",
+        "stdlib.h": "c",
+        "string.h": "c"
+    }
+}

@@ -1,6 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+const char key[26] = "abcdefghijklmnopqrstuvwxyz";
+
+void encryptDecrypt(char *data)
+{
+    size_t keyLen = strlen(key);
+    int keyIndex = 0;
+
+    for (int i = 0; data[i] != '\0'; i++)
+    {
+        if (data[i] != ' ') // skip spaces
+        {
+            data[i] ^= key[keyIndex % keyLen];
+            keyIndex++;
+        }
+    }
+}
 
 char admin_username[50] = "jawad";
 
@@ -140,11 +156,13 @@ void loginUser()
         strcpy(logedInUserName, newUser.username);
         if (strcmp(logedInUserName, admin_username) == 0)
         {
+            system("cls");
             printf("Welcome admin , %s!\n", logedInUserName);
             adminPanel();
         }
         else
         {
+            system("cls");
             printf("Welcome, %s!\n", logedInUserName);
             userDashboard();
         }
@@ -195,6 +213,7 @@ void userDashboard()
             break;
         case 7:
             printf("Logging out...\n");
+            system("cls");
             return;
         default:
             printf("Invalid choice! Try again.\n");
@@ -247,8 +266,8 @@ void adminPanel()
             deleteNote(temp_username);
             break;
         case 7:
-            takeInput(temp_username);
-            createNote(temp_username);
+            // takeInput(temp_username);
+            createNote(logedInUserName);
             break;
         case 8:
             // takeInput(temp_username);
@@ -256,6 +275,7 @@ void adminPanel()
             break; // Logout
         case 9:
             printf("Logging out...\n");
+            system("cls");
             return; // Logout
         default:
             printf("Invalid choice! Try again.\n");
@@ -316,11 +336,13 @@ void createNote(char username[50])
     printf("Enter title: ");
     fgets(newNote.title, sizeof(newNote.title), stdin);
     newNote.title[strcspn(newNote.title, "\n")] = '\0'; // Remove the newline character
+    encryptDecrypt(newNote.title);                      // Now encrypt, after \n is removed
 
-    // Get the description for the new note
+    // Get the description
     printf("Enter description: ");
     fgets(newNote.description, sizeof(newNote.description), stdin);
     newNote.description[strcspn(newNote.description, "\n")] = '\0'; // Remove the newline character
+    encryptDecrypt(newNote.description);                            // Encrypt after cleanup
 
     // Open the file to append the new note
     FILE *file1 = fopen("note.txt", "a");
@@ -402,6 +424,8 @@ void showUserNotes(char username[50])
                     }
                     else
                     {
+                        encryptDecrypt(storedNote.title);
+                        encryptDecrypt(storedNote.description);
                         printf("Note ID: %d\n", storedNote.id);
                         printf("Username: %s\n", storedNote.username);
                         printf("Title: %s\n", storedNote.title);
@@ -614,6 +638,8 @@ void editNote(char username[50])
                    &storedNote.id, storedNote.username, storedNote.title, storedNote.description) == 4)
         {
 
+            encryptDecrypt(storedNote.title);
+            encryptDecrypt(storedNote.description);
             // Trim trailing spaces
 
             size_t tlen = strlen(storedNote.title);
@@ -638,6 +664,8 @@ void editNote(char username[50])
                 scanf(" %[^\n]", storedNote.description);
             }
 
+            encryptDecrypt(storedNote.title);
+            encryptDecrypt(storedNote.description);
             // Write the updated note to the temp file, adding a newline after each note
             fprintf(temp, "id:%d username:%s title:%s# description:%s#\n",
                     storedNote.id, storedNote.username, storedNote.title, storedNote.description);
@@ -694,6 +722,8 @@ void searchNoteById(char username[50])
                    &storedNote.id, storedNote.username, storedNote.title, storedNote.description) == 4)
         {
 
+            encryptDecrypt(storedNote.title);
+            encryptDecrypt(storedNote.description);
             // Trim trailing spaces
             size_t tlen = strlen(storedNote.title);
             if (tlen > 0 && storedNote.title[tlen - 1] == ' ')
